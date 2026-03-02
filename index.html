@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kick Leaderboard - Elite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: url('background.png') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0; min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            font-family: 'Fredoka', sans-serif; color: #fefce8;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5); z-index: -1;
+        }
+
+        .top-chatters-container {
+            width: 95%; max-width: 1000px; height: 92vh;
+            padding: 40px; border-radius: 40px;
+            display: flex; flex-direction: column;
+            background: rgba(15, 10, 35, 0.85);
+            backdrop-filter: blur(30px);
+            border: 2px solid rgba(123, 44, 191, 0.5);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 1);
+        }
+
+        h3 { 
+            font-size: 3.5em; margin: 0 0 30px 0; text-align: center; 
+            letter-spacing: 6px; text-shadow: 0 0 25px #7b2cbf;
+            text-transform: uppercase; font-weight: 700;
+        }
+
+        /* BIG BOLD CONTROLS */
+        .controls-wrapper {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px; border-radius: 25px;
+            margin-bottom: 30px; border: 1px solid rgba(123, 44, 191, 0.3);
+        }
+
+        .quick-filters {
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); /* 4 Equal columns */
+            gap: 15px; margin-bottom: 25px;
+        }
+
+        .filter-btn {
+            background: rgba(123, 44, 191, 0.2); color: white; border: 2px solid #7b2cbf;
+            padding: 18px; border-radius: 15px; cursor: pointer;
+            font-size: 1.1em; font-weight: 700; font-family: 'Fredoka';
+            text-transform: uppercase; transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .filter-btn:hover {
+            background: #7b2cbf; transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(123, 44, 191, 0.8);
+            border-color: #9d4edd;
+        }
+
+        /* The Apply Button - Extra Big & Cyan */
+        .filter-btn.apply {
+            background: #00eaff; color: #000; border-color: #00eaff;
+            width: 220px; font-size: 1.2em; margin-left: 20px;
+        }
+
+        .filter-btn.apply:hover {
+            background: #ffffff; box-shadow: 0 0 30px rgba(0, 234, 255, 0.7);
+        }
+
+        .date-inputs {
+            display: flex; gap: 20px; justify-content: center; align-items: center;
+        }
+
+        .input-group { display: flex; align-items: center; gap: 12px; }
+        .input-group label { font-size: 1em; font-weight: 700; color: #7b2cbf; }
+        
+        input[type="date"] {
+            background: rgba(0, 0, 0, 0.7); border: 2px solid rgba(123, 44, 191, 0.6);
+            color: white; padding: 15px; border-radius: 12px;
+            font-size: 1.1em; font-family: 'Fredoka'; outline: none; transition: 0.3s;
+        }
+
+        input[type="date"]:focus { border-color: #00eaff; box-shadow: 0 0 15px rgba(0, 234, 255, 0.4); }
+
+        /* SCROLL AREA */
+        .leaderboard-scroll-area { list-style: none; padding: 0 15px; margin: 0; flex-grow: 1; overflow-y: auto; }
+
+        .chatter-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 22px 35px; margin-bottom: 18px;
+            background: rgba(255, 255, 255, 0.04); border-radius: 20px;
+            border: 1px solid rgba(123, 44, 191, 0.15); transition: 0.4s;
+        }
+
+        .chatter-row:hover { transform: scale(1.02); border-color: #00eaff; background: rgba(30, 20, 70, 0.7); }
+
+        .rank-number { color: #00eaff; font-weight: 700; font-size: 2em; width: 80px; }
+        .chatter-name { flex-grow: 1; font-weight: 600; font-size: 1.8em; }
+        .msg-count { font-size: 1.3em; background: linear-gradient(135deg, #7b2cbf, #5a189a); padding: 10px 25px; border-radius: 30px; font-weight: bold; border: 1px solid rgba(255,255,255,0.1); }
+
+        /* TOP 3 GLOW */
+        .chatter-row:nth-child(1) .rank-number { color: #ffd700; filter: drop-shadow(0 0 8px #ffd700); }
+        .chatter-row:nth-child(2) .rank-number { color: #c0c0c0; filter: drop-shadow(0 0 8px #c0c0c0); }
+        .chatter-row:nth-child(3) .rank-number { color: #cd7f32; filter: drop-shadow(0 0 8px #cd7f32); }
+
+        .leaderboard-scroll-area::-webkit-scrollbar { width: 10px; }
+        .leaderboard-scroll-area::-webkit-scrollbar-thumb { background: #7b2cbf; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="top-chatters-container">
+        <h3>🏆 LEADERBOARD</h3>
+
+        <div class="controls-wrapper">
+            <div class="quick-filters">
+                <button class="filter-btn" onclick="setPreset('daily')">Daily</button>
+                <button class="filter-btn" onclick="setPreset('weekly')">Weekly</button>
+                <button class="filter-btn" onclick="setPreset('monthly')">Monthly</button>
+                <button class="filter-btn" onclick="setPreset('all')">All Time</button>
+            </div>
+
+            <div class="date-inputs">
+                <div class="input-group">
+                    <label>FROM</label>
+                    <input type="date" id="startDate">
+                </div>
+                <div class="input-group">
+                    <label>TO</label>
+                    <input type="date" id="endDate">
+                </div>
+                <button onclick="updateLeaderboard()" class="filter-btn apply">REFRESH LIST</button>
+            </div>
+        </div>
+
+        <ul class="leaderboard-scroll-area" id="kick-chatter-list">
+            <li class="chatter-row">Fetching data from Atlas...</li>
+        </ul>
+    </div>
+
+    <script>
+        const API_URL = "http://localhost:3000/api/top50";
+
+        function setPreset(type) {
+            const startInput = document.getElementById('startDate');
+            const endInput = document.getElementById('endDate');
+            const now = new Date();
+            let start = new Date();
+
+            if (type === 'all') {
+                startInput.value = "";
+                endInput.value = "";
+            } else {
+                if (type === 'daily') start.setDate(now.getDate());
+                if (type === 'weekly') start.setDate(now.getDate() - 7);
+                if (type === 'monthly') start.setMonth(now.getMonth() - 1);
+                
+                startInput.value = start.toISOString().split('T')[0];
+                endInput.value = now.toISOString().split('T')[0];
+            }
+            updateLeaderboard();
+        }
+
+        async function updateLeaderboard() {
+            const start = document.getElementById('startDate').value;
+            const end = document.getElementById('endDate').value;
+            let url = API_URL;
+            if (start && end) url += `?start=${start}&end=${end}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                const list = document.getElementById('kick-chatter-list');
+                
+                list.innerHTML = data.length ? data.map((user, index) => `
+                    <li class="chatter-row">
+                        <span class="rank-number">#${index + 1}</span>
+                        <span class="chatter-name">${user.username}</span>
+                        <span class="msg-count">${user.total_messages} msgs</span>
+                    </li>
+                `).join('') : "<li class='chatter-row'>No messages found for this period.</li>";
+            } catch (err) { console.error("API Connection Error:", err); }
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(updateLeaderboard, 30000);
+        updateLeaderboard();
+    </script>
+</body>
+</html>
