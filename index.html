@@ -6,6 +6,39 @@
     <title>Kick Leaderboard - Elite</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
+        /* --- NEW GIVEAWAY BUTTON STYLE --- */
+        .giveaway-link {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        .giveaway-btn {
+            background: rgba(15, 10, 35, 0.6); /* Dark purple tint */
+            color: #fefce8;
+            padding: 12px 30px;
+            border-radius: 18px;
+            border: 2px solid #3c1e70; /* Muted purple border */
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.4em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .giveaway-btn:hover {
+            border-color: #7b2cbf;
+            background: rgba(123, 44, 191, 0.2);
+            box-shadow: 0 0 15px rgba(123, 44, 191, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* --- REST OF YOUR CSS --- */
         body {
             background: url('background.png') no-repeat center center fixed;
             background-size: cover;
@@ -13,6 +46,7 @@
             display: flex; justify-content: center; align-items: center;
             font-family: 'Fredoka', sans-serif; color: #fefce8;
             overflow: hidden;
+            position: relative; /* Needed for absolute positioning of the button */
         }
 
         body::before {
@@ -36,7 +70,6 @@
             text-transform: uppercase; font-weight: 700;
         }
 
-        /* BIG BOLD CONTROLS */
         .controls-wrapper {
             background: rgba(255, 255, 255, 0.05);
             padding: 30px; border-radius: 25px;
@@ -45,7 +78,7 @@
 
         .quick-filters {
             display: grid; 
-            grid-template-columns: repeat(4, 1fr); /* 4 Equal columns */
+            grid-template-columns: repeat(4, 1fr);
             gap: 15px; margin-bottom: 25px;
         }
 
@@ -54,41 +87,22 @@
             padding: 18px; border-radius: 15px; cursor: pointer;
             font-size: 1.1em; font-weight: 700; font-family: 'Fredoka';
             text-transform: uppercase; transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        .filter-btn:hover {
-            background: #7b2cbf; transform: translateY(-3px);
-            box-shadow: 0 0 20px rgba(123, 44, 191, 0.8);
-            border-color: #9d4edd;
-        }
+        .filter-btn:hover { background: #7b2cbf; transform: translateY(-3px); }
 
-        /* The Apply Button - Extra Big & Cyan */
-        .filter-btn.apply {
-            background: #00eaff; color: #000; border-color: #00eaff;
-            width: 220px; font-size: 1.2em; margin-left: 20px;
-        }
+        .filter-btn.apply { background: #00eaff; color: #000; border-color: #00eaff; width: 220px; }
 
-        .filter-btn.apply:hover {
-            background: #ffffff; box-shadow: 0 0 30px rgba(0, 234, 255, 0.7);
-        }
-
-        .date-inputs {
-            display: flex; gap: 20px; justify-content: center; align-items: center;
-        }
-
+        .date-inputs { display: flex; gap: 20px; justify-content: center; align-items: center; }
         .input-group { display: flex; align-items: center; gap: 12px; }
         .input-group label { font-size: 1em; font-weight: 700; color: #7b2cbf; }
         
         input[type="date"] {
             background: rgba(0, 0, 0, 0.7); border: 2px solid rgba(123, 44, 191, 0.6);
             color: white; padding: 15px; border-radius: 12px;
-            font-size: 1.1em; font-family: 'Fredoka'; outline: none; transition: 0.3s;
+            font-size: 1.1em; font-family: 'Fredoka'; outline: none;
         }
 
-        input[type="date"]:focus { border-color: #00eaff; box-shadow: 0 0 15px rgba(0, 234, 255, 0.4); }
-
-        /* SCROLL AREA */
         .leaderboard-scroll-area { list-style: none; padding: 0 15px; margin: 0; flex-grow: 1; overflow-y: auto; }
 
         .chatter-row {
@@ -98,31 +112,25 @@
             border: 1px solid rgba(123, 44, 191, 0.15); transition: 0.4s;
         }
 
-        .chatter-row:hover { transform: scale(1.02); border-color: #00eaff; background: rgba(30, 20, 70, 0.7); }
-
         .rank-number { color: #00eaff; font-weight: 700; font-size: 2em; width: 80px; }
         .chatter-name { flex-grow: 1; font-weight: 600; font-size: 1.8em; }
-        .msg-count { font-size: 1.3em; background: linear-gradient(135deg, #7b2cbf, #5a189a); padding: 10px 25px; border-radius: 30px; font-weight: bold; border: 1px solid rgba(255,255,255,0.1); }
-
-        /* TOP 3 GLOW */
-        .chatter-row:nth-child(1) .rank-number { color: #ffd700; filter: drop-shadow(0 0 8px #ffd700); }
-        .chatter-row:nth-child(2) .rank-number { color: #c0c0c0; filter: drop-shadow(0 0 8px #c0c0c0); }
-        .chatter-row:nth-child(3) .rank-number { color: #cd7f32; filter: drop-shadow(0 0 8px #cd7f32); }
-
-        .leaderboard-scroll-area::-webkit-scrollbar { width: 10px; }
-        .leaderboard-scroll-area::-webkit-scrollbar-thumb { background: #7b2cbf; border-radius: 10px; }
+        .msg-count { font-size: 1.3em; background: linear-gradient(135deg, #7b2cbf, #5a189a); padding: 10px 25px; border-radius: 30px; font-weight: bold; }
     </style>
 </head>
 <body>
+
+    <a href="https://neogiveaway.great-site.net" class="giveaway-link" target="_blank">
+        <div class="giveaway-btn">Giveaway</div>
+    </a>
 
     <div class="top-chatters-container">
         <h3>🏆 LEADERBOARD</h3>
 
         <div class="controls-wrapper">
             <div class="quick-filters">
-                <button class="filter-btn" onclick="setPreset('daily')">Daily</button>
-                <button class="filter-btn" onclick="setPreset('weekly')">Weekly</button>
-                <button class="filter-btn" onclick="setPreset('monthly')">Monthly</button>
+                <button class="filter-btn" onclick="setPreset('daily')">Daily Top</button>
+                <button class="filter-btn" onclick="setPreset('weekly')">Weekly Top</button>
+                <button class="filter-btn" onclick="setPreset('monthly')">Monthly Top</button>
                 <button class="filter-btn" onclick="setPreset('all')">All Time</button>
             </div>
 
@@ -145,7 +153,7 @@
     </div>
 
     <script>
-        const API_URL = "https://kick-leaderboard-zr1f.onrender.com/api/top50";
+        const API_URL = "/api/top50";
 
         function setPreset(type) {
             const startInput = document.getElementById('startDate');
@@ -188,10 +196,8 @@
             } catch (err) { console.error("API Connection Error:", err); }
         }
 
-        // Auto-refresh every 30 seconds
         setInterval(updateLeaderboard, 30000);
         updateLeaderboard();
     </script>
 </body>
-
 </html>
