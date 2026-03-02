@@ -2,10 +2,15 @@ const WebSocket = require('ws');
 const { MongoClient } = require('mongodb');
 const express = require('express');
 const cors = require('cors');
-const path = require('path'); // <-- Added for file paths
+const path = require('path');
 
 const app = express();
 app.use(cors());
+
+// --- 🛠️ STATIC FILES SUPPORT ---
+// This line allows the browser to access images like 'background.png' 
+// if they are in the same folder as this script.
+app.use(express.static(__dirname));
 
 // --- CONFIG ---
 const MONGO_URI = "mongodb+srv://guardian:Leopereira22@cluster0.u9ytsqd.mongodb.net/kick_stats?retryWrites=true&w=majority"; 
@@ -73,7 +78,7 @@ function startKickBot() {
 
 // --- ROUTES ---
 
-// 1. Serve the Frontend (Tiny line added here)
+// 1. Serve the Dashboard (index.html)
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
