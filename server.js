@@ -2,6 +2,7 @@ const WebSocket = require('ws');
 const { MongoClient } = require('mongodb');
 const express = require('express');
 const cors = require('cors');
+const path = require('path'); // <-- Added for file paths
 
 const app = express();
 app.use(cors());
@@ -18,6 +19,7 @@ const kickEmotes = ["asmonSmash", "AYAYA", "BBoomer", "beeBobble", "Bwop", "Capt
 const extraEmojis = ["Angel", "Angry", "Astonished", "Awake", "BlowKiss", "Bubbly", "Cheerful", "Clown", "Cool", "Crave", "Cry", "Crying", "Curious", "Cute", "Dead", "Devil", "Disappoint", "Disguise", "DJ", "Down", "Enraged", "Excited", "EyeRoll", "Fire", "Gamer", "Glass", "Goofy", "Gramps", "Grimacing", "Grin", "Grumpy", "Happy", "HeartEyes", "Hmm", "Hydrate", "King", "Kiss", "Lady", "Laughing", "Loading", "Lol", "Man", "MoneyEyes", "No", "Oof", "Oooh", "Ouch", "Pleading", "Rich", "Shocked", "Sleep", "Smart", "Smerking", "Smiling", "Sorry", "Stare", "StarEyes", "Swearing", "Unamused", "Vomiting", "Wink", "XEyes", "Yay", "Yes", "Yuh", "Yum"];
 const allForbidden = [...kickEmotes, ...extraEmojis.map(e => "emoji" + e)];
 
+// --- DATABASE ---
 async function connectDB() {
     try {
         const client = await MongoClient.connect(MONGO_URI);
@@ -26,11 +28,12 @@ async function connectDB() {
     } catch (err) { console.error("❌ DB Error:", err); }
 }
 
+// --- KICK BOT ---
 function startKickBot() {
     const ws = new WebSocket('wss://ws-us2.pusher.com/app/32cbd69e4b950bf97679?protocol=7&client=js&version=8.4.0-rc2&flash=false');
 
     ws.on('open', () => {
-        console.log("📡 Listening to Kick Chat...");
+        console.log("📡 Bot Listening...");
         ws.send(JSON.stringify({ event: 'pusher:subscribe', data: { channel: `chatrooms.${KICK_CHANNEL_ID}.v2` } }));
     });
 
@@ -68,6 +71,14 @@ function startKickBot() {
     ws.on('close', () => setTimeout(startKickBot, 5000));
 }
 
+// --- ROUTES ---
+
+// 1. Serve the Frontend (Tiny line added here)
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// 2. API Endpoint for data
 app.get('/api/top50', async (req, res) => {
     try {
         const { start, end } = req.query;
